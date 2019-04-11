@@ -12,13 +12,16 @@ import cv2
 
 # Get a reference to webcam #0 (the default one)
 
+escale = 0.25
+camera_default = 0      #0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
+
 cams_test = 10
 for i in range(0, cams_test):
     cap = cv2.VideoCapture(i)
     test, frame = cap.read()
     print("i : "+str(i)+" /// result: "+str(test))
 
-video_capture = cv2.VideoCapture(2)
+video_capture = cv2.VideoCapture(camera_default)
 
 # Load a sample picture and learn how to recognize it.
 fer_image = face_recognition.load_image_file("imagens/fer.jpg")
@@ -67,7 +70,7 @@ while True:
     ret, frame = video_capture.read()
 
     # Resize frame of video to 1/4 size for faster face recognition processing
-    small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+    small_frame = cv2.resize(frame, (0, 0), fx=escale, fy=escale)
 
     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
     rgb_small_frame = small_frame[:, :, ::-1]
@@ -99,10 +102,10 @@ while True:
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-        top *= 2
-        right *= 2
-        bottom *= 2
-        left *= 2
+        top *= escale*16
+        right *= escale*16
+        bottom *= escale*16
+        left *= escale*16
 
         # Draw a box around the face
         cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
