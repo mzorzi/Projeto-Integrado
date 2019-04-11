@@ -13,13 +13,13 @@ camera_default = 0
 path = "imagens/faces/"
 unknown_face = "Leigo"
 
-"""
+
 cams_test = 10
 for i in range(0, cams_test):
     cap = cv2.VideoCapture(i)
     test, frame = cap.read()
     print("i : "+str(i)+" /// result: "+str(test))
-"""
+
 
 
 video_capture = cv2.VideoCapture(camera_default)
