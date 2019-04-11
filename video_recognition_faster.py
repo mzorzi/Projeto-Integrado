@@ -8,10 +8,10 @@ import os
 #   2. Only detect faces in every other frame of video.
 
 escale = 0.25
-# 0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
-camera_default = 0
+camera_default = 0      #0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
+path = "imagens/faces"
+
 """
-#loop para testar 10 cameras e ver quais estao disponiveis
 cams_test = 10
 for i in range(0, cams_test):
     cap = cv2.VideoCapture(i)
