@@ -14,6 +14,7 @@ import cv2
 
 escale = 0.25
 camera_default = 0      #0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
+path = "imagens/"
 
 cams_test = 10
 for i in range(0, cams_test):
