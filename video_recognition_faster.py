@@ -1,6 +1,8 @@
 import face_recognition
 import cv2
 import os
+import requests
+import numpy as np
 
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
@@ -11,7 +13,9 @@ import os
 escale = 0.5
 camera_default = 0
 path = "imagens/faces/"
-unknown_face = "Leigo"
+unknown_face = "Unknown"
+
+
 
 """
 cams_test = 10
@@ -81,7 +85,7 @@ while True:
 
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
-        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+        # Scale back up face lopathd to 1/4 size
         top *= int(1/escale)
         right *= int(1/escale)
         bottom *= int(1/escale)
@@ -102,6 +106,7 @@ while True:
                     font, 1.0, (255, 255, 255), 1)
         print(name + " encontrado!")
     # Display the resulting image
+    # gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY) Descomentar essa linha e trocar frame por gray para gerar imagem em preto e branco 
     cv2.imshow('Video', frame)
 
     # Hit 'q' on the keyboard to quit!
