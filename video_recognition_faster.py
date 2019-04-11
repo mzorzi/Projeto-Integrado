@@ -13,12 +13,14 @@ camera_default = 2
 path = "imagens/faces/"
 unknown_face = "Leigo"
 
-
+"""
 cams_test = 10
 for i in range(0, cams_test):
     cap = cv2.VideoCapture(i)
     test, frame = cap.read()
     print("i : "+str(i)+" /// result: "+str(test))
+"""
+
 
 video_capture = cv2.VideoCapture(camera_default)
 
@@ -34,8 +36,7 @@ for file in os.listdir(directory):
         known_face_names.append(filename[:-4])
         count = count + 1
         continue
-    else:
-        continue
+
 print("Banco de dados: {} imagens".format(count))
 
 
@@ -85,7 +86,7 @@ while True:
         right *= int(1/escale)
         bottom *= int(1/escale)
         left *= int(1/escale)
-
+        
         color = (0, 0, 255)
         if unknown_face in name:
             color = (0, 255, 0)
@@ -99,7 +100,7 @@ while True:
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6),
                     font, 1.0, (255, 255, 255), 1)
-
+        print(name + " encontrado!")
     # Display the resulting image
     cv2.imshow('Video', frame)
 
