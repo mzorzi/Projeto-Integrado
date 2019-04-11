@@ -8,8 +8,9 @@ import os
 #   2. Only detect faces in every other frame of video.
 
 escale = 0.25
-camera_default = 0      #0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
-path = "imagens/faces"
+# 0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
+camera_default = 0
+path = "imagens/faces/"
 
 """
 cams_test = 10
@@ -20,52 +21,21 @@ for i in range(0, cams_test):
 """
 video_capture = cv2.VideoCapture(camera_default)
 
-directory = os.fsencode("imagens/faces")
+directory = os.fsencode(path)
 count = 0
+known_face_encodings = []
+known_face_names = []
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
     if filename.endswith(".jpg") or filename.endswith(".png"):
+        known_face_encodings.append(face_recognition.face_encodings(face_recognition.load_image_file(path+filename))[0])
+        known_face_names.append(filename[:-4])
         count = count + 1
         continue
     else:
         continue
 print("Banco de dados: {} imagens".format(count))
 
-# Load a sample picture and learn how to recognize it.
-fer_image = face_recognition.load_image_file("imagens/faces/fer.jpg")
-fer_face_encoding = face_recognition.face_encodings(fer_image)[0]
-
-# Load a second sample picture and learn how to recognize it.
-fallen_image = face_recognition.load_image_file("imagens/faces/fallen.jpg")
-fallen_face_encoding = face_recognition.face_encodings(fallen_image)[0]
-
-# Load a second sample picture and learn how to recognize it.
-murilo_image = face_recognition.load_image_file("imagens/faces/murilo.jpg")
-murilo_face_encoding = face_recognition.face_encodings(murilo_image)[0]
-
-# Load a second sample picture and learn how to recognize it.
-pupo_image = face_recognition.load_image_file("imagens/faces/pupo.jpg")
-pupo_face_encoding = face_recognition.face_encodings(pupo_image)[0]
-
-# Load a second sample picture and learn how to recognize it.
-ettore_image = face_recognition.load_image_file("imagens/faces/ettore.jpg")
-ettore_face_encoding = face_recognition.face_encodings(ettore_image)[0]
-
-# Create arrays of known face encodings and their names
-known_face_encodings = [
-    fer_face_encoding,
-    fallen_face_encoding,
-    murilo_face_encoding,
-    pupo_face_encoding,
-    ettore_face_encoding
-]
-known_face_names = [
-    "Fer",
-    "Fallen",
-    "Murilo",
-    "Matheus",
-    "Etotore"
-]
 
 # Initialize some variables
 face_locations = []
