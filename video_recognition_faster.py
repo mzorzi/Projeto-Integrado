@@ -9,7 +9,7 @@ import os
 
 # 0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
 escale = 0.5
-camera_default = 2
+camera_default = 0
 path = "imagens/faces/"
 unknown_face = "Leigo"
 
