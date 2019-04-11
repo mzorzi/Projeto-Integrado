@@ -7,18 +7,19 @@ import os
 #   1. Process each video frame at 1/4 resolution (though still display it at full resolution)
 #   2. Only detect faces in every other frame of video.
 
-escale = 0.25
 # 0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
-camera_default = 0
+escale = 0.5
+camera_default = 2
 path = "imagens/faces/"
+unknown_face = "Leigo"
 
-"""
+
 cams_test = 10
 for i in range(0, cams_test):
     cap = cv2.VideoCapture(i)
     test, frame = cap.read()
     print("i : "+str(i)+" /// result: "+str(test))
-"""
+
 video_capture = cv2.VideoCapture(camera_default)
 
 directory = os.fsencode(path)
@@ -28,7 +29,8 @@ known_face_names = []
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
     if filename.endswith(".jpg") or filename.endswith(".png"):
-        known_face_encodings.append(face_recognition.face_encodings(face_recognition.load_image_file(path+filename))[0])
+        known_face_encodings.append(face_recognition.face_encodings(
+            face_recognition.load_image_file(path+filename))[0])
         known_face_names.append(filename[:-4])
         count = count + 1
         continue
@@ -47,7 +49,7 @@ while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
 
-    # Resize frame of video to 1/4 size for faster face recognition processing
+    # Resize frame of video to "escale" size for faster face recognition processing
     small_frame = cv2.resize(frame, (0, 0), fx=escale, fy=escale)
 
     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
@@ -65,7 +67,7 @@ while True:
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(
                 known_face_encodings, face_encoding)
-            name = "Unknown"
+            name = unknown_face
 
             # If a match was found in known_face_encodings, just use the first one.
             if True in matches:
@@ -79,13 +81,13 @@ while True:
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         # Scale back up face locations since the frame we detected in was scaled to 1/4 size
-        top *= int(escale*16)
-        right *= int(escale*16)
-        bottom *= int(escale*16)
-        left *= int(escale*16)
+        top *= int(1/escale)
+        right *= int(1/escale)
+        bottom *= int(1/escale)
+        left *= int(1/escale)
 
         color = (0, 0, 255)
-        if "Unknown" in name:
+        if unknown_face in name:
             color = (0, 255, 0)
 
         # Draw a box around the face
