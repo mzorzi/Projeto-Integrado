@@ -4,7 +4,7 @@ import requests
 import numpy as np
 
 
-url = "http://192.168.0.13:8080/shot.jpg"
+url = "http://192.168.1.108:8080/shot.jpg"
 
 while True:
     img_resp = requests.get(url)

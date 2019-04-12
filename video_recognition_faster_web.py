@@ -4,12 +4,22 @@ import os
 import requests
 import numpy as np
 
+
+url = "http://192.168.43.166:8080/shot.jpg"
+
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
 #   1. Process each video frame at 1/4 resolution (though still display it at full resolution)
 #   2. Only detect faces in every other frame of video.
 
 # 0 é a webcam nativa, ver o print do loop abaixo para ver as webcans disponiveis
+# por default, a resolução do ipvideo é 1920x1080
+# com a escala fica:
+# escale 1 = 1920x1080 
+# escale 0.5 = 960x540 
+# escale 0.25 = 480x270
+
+
 escale = 0.5
 camera_default = 0
 path = "imagens/faces/"
@@ -17,7 +27,7 @@ unknown_face = "Unknown"
 
 
 
-
+"""
 cams_test = 10
 for i in range(0, cams_test):
     cap = cv2.VideoCapture(i)
@@ -27,7 +37,7 @@ for i in range(0, cams_test):
 
 
 video_capture = cv2.VideoCapture(camera_default)
-
+"""
 directory = os.fsencode(path)
 count = 0
 known_face_encodings = []
@@ -53,7 +63,10 @@ process_this_frame = True
 while True:
     # Grab a single frame of video
     # frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY) Descomentar essa linha e trocar frame por gray para gerar imagem em preto e branco 
-    ret, frame = video_capture.read()
+    img_resp = requests.get(url)
+    img_arr = np.array(bytearray(img_resp.content),dtype=np.uint8)
+    frame = cv2.imdecode(img_arr, -1)
+    #ret, frame = video_capture.read()
 
     # Resize frame of video to "escale" size for faster face recognition processing
     small_frame = cv2.resize(frame, (0, 0), fx=escale, fy=escale)
@@ -105,10 +118,11 @@ while True:
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6),
                     font, 1.0, (255, 255, 255), 1)
-        print(name + " encontrado!")
+        #print(name + " encontrado!")
     # Display the resulting image
-    
-    cv2.imshow('Video', frame)
+    # Resize frame
+    resize_frame = cv2.resize(frame, (960, 540))
+    cv2.imshow('Video', resize_frame)
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
