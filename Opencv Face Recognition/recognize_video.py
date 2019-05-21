@@ -14,6 +14,10 @@ import pickle
 import time
 import cv2
 import os
+import requests
+
+#IP DA CAMERA, QUANDO USAR PELA WEB
+#url = "http://192.168.43.69:8080/shot.jpg"
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -55,6 +59,13 @@ fps = FPS().start()
 # loop over frames from the video file stream
 while True:
     # grab the frame from the threaded video stream
+
+    #PARA VIDEO PELA WEB
+    #------------------#
+    #img_resp = requests.get(url)
+    #img_arr = np.array(bytearray(img_resp.content),dtype=np.uint8)
+    #frame = cv2.imdecode(img_arr, -1)
+    #------------------#
     frame = vs.read()
 
     # resize the frame to have a width of 600 pixels (while
