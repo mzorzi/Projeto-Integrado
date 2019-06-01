@@ -13,13 +13,13 @@ length = int(input_movie.get(cv2.CAP_PROP_FRAME_COUNT))
 
 # Create an output movie file (make sure resolution/frame rate matches input video!)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-output_movie = cv2.VideoWriter('output.avi', fourcc, 29.97, (640, 360))
+output_movie = cv2.VideoWriter('output.avi', fourcc, 30, (640, 480))
 
 # Load some sample pictures and learn how to recognize them.
-lmm_image = face_recognition.load_image_file("imagens/faces/Murilo Martos.jpg")
+lmm_image = face_recognition.load_image_file("/home/murilo/Downloads/Github/Projeto-Integrado/Opencv Face Recognition/dataset/murilo/0000.jpg")
 lmm_face_encoding = face_recognition.face_encodings(lmm_image)[0]
 
-al_image = face_recognition.load_image_file("imagens/faces/Mateus Zorzi.jpg")
+al_image = face_recognition.load_image_file("/home/murilo/Downloads/Github/Projeto-Integrado/Opencv Face Recognition/dataset/mateus/0000.jpg")
 al_face_encoding = face_recognition.face_encodings(al_image)[0]
 
 known_faces = [

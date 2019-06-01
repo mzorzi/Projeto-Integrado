@@ -21,7 +21,7 @@ fi
 
 echo "Deseja testar em:"
 echo "1-IMAGEM"
-echo "2-VIDEO"
+echo "2-WEBCAM"
 
 read opcao_escolhida
 
@@ -33,7 +33,7 @@ then
 elif [ $opcao_escolhida == "2" ];
     then
         echo "Fazendo reconhecimento em video..."
-        python3.6 recognize_video.py --detector face_detection_model --embedding-model openface_nn4.small2.v1.t7 --recognizer output/recognizer.pickle --le output/le.pickle 
+        python3.6 recognize_webcan.py --detector face_detection_model --embedding-model openface_nn4.small2.v1.t7 --recognizer output/recognizer.pickle --le output/le.pickle 
 else
     echo "Opcao invalida!"
 
