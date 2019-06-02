@@ -53,13 +53,13 @@ print("[INFO] starting video stream...")
 
 
 # Open the input movie file
-vs = cv2.VideoCapture("video_input/video1.mp4")
+vs = cv2.VideoCapture("video_input/video2.mp4")
 length = int(vs.get(cv2.CAP_PROP_FRAME_COUNT))
 
 # Create an output movie file (make sure resolution/frame rate matches input video!)
 # o certo é 640x480, mas tem que ver o tamanho da janela de output do video, e mudar aqui
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-output_movie = cv2.VideoWriter('video_output/video1.avi', fourcc, 30, (600, 450))
+output_movie = cv2.VideoWriter('video_output/video2.avi', fourcc, 30, (600, 337))
 
 
 time.sleep(2.0)
@@ -85,9 +85,10 @@ while True:
     # resize the frame to have a width of 600 pixels (while
     # maintaining the aspect ratio), and then grab the image
     # dimensions
+    
     frame = imutils.resize(frame, width=600)
     (h, w) = frame.shape[:2]
-
+    print("[INFO] w: {} h:{}".format(h, w))
     # construct a blob from the image
     imageBlob = cv2.dnn.blobFromImage(
         cv2.resize(frame, (300, 300)), 1.0, (300, 300),
