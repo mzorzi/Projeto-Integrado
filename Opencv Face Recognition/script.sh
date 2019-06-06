@@ -29,7 +29,7 @@ if [ $opcao_escolhida == "1" ];
 then
     echo "Fazendo reconhecimento em imagem..."
     echo "Usando imagem: mumamaettvic.jpg"
-    python3.6 recognize.py --detector face_detection_model --embedding-model openface_nn4.small2.v1.t7 --recognizer output/recognizer.pickle --le output/le.pickle --image images/mumamaettvic.jpg 
+    python3.6 recognize.py --detector face_detection_model --embedding-model openface_nn4.small2.v1.t7 --recognizer output/recognizer.pickle --le output/le.pickle --image images/praca1.png 
 elif [ $opcao_escolhida == "2" ];
     then
         echo "Fazendo reconhecimento em video..."

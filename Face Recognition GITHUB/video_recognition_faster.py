@@ -55,10 +55,10 @@ while True:
     # Grab a single frame of video
     # frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY) Descomentar essa linha e trocar frame por gray para gerar imagem em preto e branco 
     ret, frame = video_capture.read()
-
+    frame = cv2.flip( frame, 0 )
     # Resize frame of video to "escale" size for faster face recognition processing
     small_frame = cv2.resize(frame, (0, 0), fx=escale, fy=escale)
-
+    
     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
     rgb_small_frame = small_frame[:, :, ::-1]
 
