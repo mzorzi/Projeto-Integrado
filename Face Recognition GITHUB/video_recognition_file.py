@@ -88,14 +88,16 @@ while True:
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         if not name:
             continue
-
+        color = (0,0,255)
+        if "Unknown" in name:
+            color = (0,255,0)
             # Draw a box around the face
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+        cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
 
             # Draw a label with a name below the face
-        cv2.rectangle(frame, (left, bottom - 25), (right, bottom), (0, 0, 255), cv2.FILLED)
-        font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
+        cv2.rectangle(frame, (left, bottom - 25), (right, bottom), color, 2)
+        cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 2)
+        
 
     process_this_frame = not process_this_frame
     # Write the resulting image to the output video file
