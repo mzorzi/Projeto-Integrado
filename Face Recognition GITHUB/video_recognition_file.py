@@ -5,19 +5,26 @@ import time
 import multiprocessing
 
 num_processadores = 4
+num_frames = 8
+#num_frames equivale á: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
+
 
 class image_queue:
         def __init__(self, frame, id):
             self.frame = frame
             self.id = id
+            self.names = []
 
 
-def func(frame_recived, known_face_encodings_recived, frame_number_recived, output_movie_recived, queue_recived, queue_images_recived):
+def func(frames_to_process_recived, known_face_encodings_recived, queue_recived, queue_images_recived):
     face_locations = []
     face_encodings = []
     face_names = []
     unknown_face = "Unknown"
-    rgb_frame = frame_recived[:, :, ::-1]
+    first_frame = frames_to_process_recived[0]
+    del frames_to_process_recived[0]
+
+    rgb_frame = first_frame.frame[:, :, ::-1]
 
     start_time = time.time()
     # Find all the faces and face encodings in the current frame of video
@@ -25,7 +32,7 @@ def func(frame_recived, known_face_encodings_recived, frame_number_recived, outp
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
     elapsed_time = time.time() - start_time
-    print("[INFO][{}] Tempo para achar rostos: {}".format(frame_number_recived,elapsed_time))
+    print("[INFO][{}] Tempo para achar rostos: {}".format(first_frame.id,elapsed_time))
     face_names = []
     start_time = time.time()
     for face_encoding in face_encodings:
@@ -42,7 +49,7 @@ def func(frame_recived, known_face_encodings_recived, frame_number_recived, outp
         face_names.append(name)
 
     elapsed_time = time.time() - start_time
-    print("[INFO][{}] Tempo para localizar faces: {}".format(frame_number_recived,elapsed_time))
+    print("[INFO][{}] Tempo para localizar faces: {}".format(first_frame.id,elapsed_time))
 
     # Label the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
@@ -51,29 +58,40 @@ def func(frame_recived, known_face_encodings_recived, frame_number_recived, outp
         color = (0,0,255)
         if "Unknown" in name:
             color = (0,255,0)
+        else:
+            first_frame.names.append(name)
+
             # Draw a box around the face
-        cv2.rectangle(frame_recived, (left, top), (right, bottom), color, 2)
+        cv2.rectangle(first_frame.frame, (left, top), (right, bottom), color, 2)
 
             # Draw a label with a name below the face
-        cv2.rectangle(frame_recived, (left, bottom - 25), (right, bottom), color, 2)
-        cv2.putText(frame_recived, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 2)
+        cv2.rectangle(first_frame.frame, (left, bottom - 25), (right, bottom), color, 2)
+        cv2.putText(first_frame.frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 2)
         
     # Write the resulting image to the output video file
+    queue_images_recived.put(image_queue(first_frame.frame, first_frame.id))
+    print("[INFO][{}] Sending processed frame {} / {}".format(first_frame.id, first_frame.id, length))
 
-    while True: 
-        rec = queue_recived.get()
-        if frame_number_recived != rec:
-            queue_recived.put(rec)
+    for j in frames_to_process_recived:
+        for (top, right, bottom, left), name in zip(face_locations, face_names):
+            if not name:
+                continue
+            color = (0,0,255)
+            if "Unknown" in name:
+                color = (0,255,0)
+            else:
+                j.names.append(name)
+                # Draw a box around the face
+            cv2.rectangle(j.frame, (left, top), (right, bottom), color, 2)
 
-        if frame_number_recived == rec:
-            to_put = image_queue(frame_recived, frame_number_recived)
-            queue_images_recived.put(to_put)
-            #output_movie_recived.write(frame_recived)   
-            queue_recived.put(rec+2)
-            #if (frame_number_recived % 100) == 0:
-            print("[INFO][{}] Writing frame {} / {}".format(frame_number_recived, frame_number_recived, length))
-            
-            break
+                # Draw a label with a name below the face
+            cv2.rectangle(j.frame, (left, bottom - 25), (right, bottom), color, 2)
+            cv2.putText(j.frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 2)
+        
+    # Write the resulting image to the output video file
+        print("[INFO][{}] Sending unprocessed frame {} / {}".format(j.id, j.id, length))
+        queue_images_recived.put(image_queue(j.frame, j.id))
+
 
     return
 
@@ -91,13 +109,15 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
+    todas_as_frames = []
+
     # Open the input movie file
     input_movie = cv2.VideoCapture("/home/murilo/Github/Dataset P.I/praca4k20sec.mp4")
     length = int(input_movie.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # Create an output movie file (make sure resolution/frame rate matches input video!)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    output_movie = cv2.VideoWriter('output.avi', fourcc, 30, (1080, 720))
+    output_movie = cv2.VideoWriter('output.avi', fourcc, 30, (1280, 720))
 
     path = "imagens/"
 
@@ -130,43 +150,39 @@ if __name__ == '__main__':
     queue = multiprocessing.Queue()
     queue_images = multiprocessing.Queue()
     queue.put(1)
-    
-
     while process_this_frame:
         jobs = []
-        counter = 1
-        for i in range(0, num_processadores * 2):
+        counter = 0
+        for i in range(0, num_processadores):
+            frames_to_process = []
         # Grab a single frame of video
-            ret, frame = input_movie.read()
-            frame_number += 1
-            #(h, w) = frame.shape[:2]
-            #print("[INFO] w: {} h:{}".format(h, w))
-            #frame = cv2.flip( frame, 0 )
-            # Quit when the input video file ends
-            if not ret:
-                process_this_frame = False
-                break
-            if i % 2 == 0:
-                process = multiprocessing.Process(target=func, args=(frame, known_face_encodings, frame_number, output_movie, queue, queue_images))
+            for j in range(0, num_frames):
+                ret, frame = input_movie.read()
+                if not ret:
+                    process_this_frame = False
+                    break
+                frame_number += 1
+                counter += 1
+                frames_to_process.append(image_queue(frame, frame_number))
+
+            if not frames_to_process:
+                print("Sem trampo, brother")
+            else:
+                process = multiprocessing.Process(target=func, args=(frames_to_process, known_face_encodings, queue, queue_images))
                 jobs.append(process)
                 process.start()
-                print("Processo da frame {} iniciado".format(frame_number))
-            else:
-                to_put = image_queue(frame, frame_number)
-                queue_images.put(to_put)
-                print("Nao Processando a frame {}".format(frame_number))
-            counter += 1
-
+                print("Processo da frame {} ate {}  iniciado".format(frame_number-num_frames+1, frame_number))
+            
         to_write = []
-
-        for i in range(1,counter):
+        for i in range(0,counter):
             to_write.append(queue_images.get())
             
-        for i in range(1, counter):
+        for i in range(0, counter):
             for t in to_write:
-                if t.id == (frame_number - counter + i):
+                if t.id == (frame_number - counter + i + 1):
                     print("[INFO] Escrevendo frame :{}".format(t.id))
-                    frame_write = cv2.resize(t.frame,(1080,720))
+                    frame_write = cv2.resize(t.frame,(1280,720))
+                    todas_as_frames.append(t)
                     output_movie.write(frame_write)
 
         
@@ -178,5 +194,8 @@ if __name__ == '__main__':
     # All done!
     elapsed_time = time.time() - start_time
     print("[INFO]Tempo total: {}".format(elapsed_time))
+    for t in todas_as_frames:
+        for n in t.names:
+            print("{} apareceu!".format(n))
     input_movie.release()
     cv2.destroyAllWindows()
