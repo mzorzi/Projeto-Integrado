@@ -5,8 +5,8 @@ import time
 import multiprocessing
 
 num_processadores = 4
-num_frames = 3
-path_video = "/home/murilo/Github/Dataset P.I/praca4k2sec.mp4"
+num_frames = 5
+path_video = "/home/murilo/Github/Dataset P.I/praca4k5min.mp4"
 
 #num_frames equivale á: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
 
@@ -202,7 +202,8 @@ if __name__ == '__main__':
     vetor_reconhecidos = []
 
     elapsed_time = time.time() - start_time
-    print("[INFO] Tempo total: {}".format(elapsed_time))
+    print("[INFO] Benchmark status:")
+    print("--- Tempo total: {}".format(elapsed_time))
     for t in todas_as_frames:
         #print("Verificando frame {}".format(t.id))
         for n in t.names:
@@ -216,7 +217,12 @@ if __name__ == '__main__':
                 vetor_reconhecidos.append(reconhecidos(n))
 
     for v in vetor_reconhecidos:
-        print("[INFO] {} apareceu em {} frames processadas".format(v.names, v.vezes))
+        print("--- {} apareceu em {} frames processadas".format(v.names, v.vezes))
+
+    print("--- Banco de Dados: {} imagens".format(count))
+    print("--- Total de Frames: {}".format(length))
+    print("--- Processadores usados: {}".format(num_processadores))
+    print("--- Processando 1 frame a cada {} frames".format(num_frames))
 
     input_movie.release()
     cv2.destroyAllWindows()
