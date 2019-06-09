@@ -5,7 +5,9 @@ import time
 import multiprocessing
 
 num_processadores = 4
-num_frames = 5
+num_frames = 3
+path_video = "/home/murilo/Github/Dataset P.I/praca4k2sec.mp4"
+
 #num_frames equivale á: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
 
 
@@ -69,7 +71,7 @@ def func(frames_to_process_recived, known_face_encodings_recived, queue_recived,
         cv2.putText(first_frame.frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 2)
         
     # Write the resulting image to the output video file
-    queue_images_recived.put(image_queue(first_frame.frame, first_frame.id))
+    queue_images_recived.put(first_frame)
     print("[INFO][{}] Sending processed frame {} / {}".format(first_frame.id, first_frame.id, length))
 
     for j in frames_to_process_recived:
@@ -79,8 +81,6 @@ def func(frames_to_process_recived, known_face_encodings_recived, queue_recived,
             color = (0,0,255)
             if "Unknown" in name:
                 color = (0,255,0)
-            else:
-                j.names.append(name)
                 # Draw a box around the face
             cv2.rectangle(j.frame, (left, top), (right, bottom), color, 2)
 
@@ -90,7 +90,7 @@ def func(frames_to_process_recived, known_face_encodings_recived, queue_recived,
         
     # Write the resulting image to the output video file
         print("[INFO][{}] Sending unprocessed frame {} / {}".format(j.id, j.id, length))
-        queue_images_recived.put(image_queue(j.frame, j.id))
+        queue_images_recived.put(j)
 
 
     return
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     todas_as_frames = []
 
     # Open the input movie file
-    input_movie = cv2.VideoCapture("/home/murilo/Github/Dataset P.I/praca4k20sec.mp4")
+    input_movie = cv2.VideoCapture(path_video)
     length = int(input_movie.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # Create an output movie file (make sure resolution/frame rate matches input video!)
@@ -135,8 +135,10 @@ if __name__ == '__main__':
             count = count + 1
             continue
 
-    print("Banco de dados: {} imagens".format(count))
-    print("Frames: {}".format(length))
+    print("[INFO] Banco de dados: {} imagens".format(count))
+    print("[INFO] Frames encontradas: {}".format(length))
+    print("[INFO] Processadores: {}".format(num_processadores))
+    print("[INFO] Pegar 1 a cada {} frames".format(num_frames))
     unknown_face = "Unknown"
     # Initialize some variables
     face_locations = []
@@ -165,13 +167,11 @@ if __name__ == '__main__':
                 counter += 1
                 frames_to_process.append(image_queue(frame, frame_number))
 
-            if not frames_to_process:
-                print("Sem trampo, brother")
-            else:
+            if frames_to_process:
                 process = multiprocessing.Process(target=func, args=(frames_to_process, known_face_encodings, queue, queue_images))
                 jobs.append(process)
                 process.start()
-                print("Processo da frame {} ate {}  iniciado".format(frame_number-num_frames+1, frame_number))
+                print("[INFO] Processo da frame {} ate {}  iniciado".format(frame_number-num_frames+1, frame_number))
             
         to_write = []
         for i in range(0,counter):
@@ -182,6 +182,7 @@ if __name__ == '__main__':
                 if t.id == (frame_number - counter + i + 1):
                     print("[INFO] Escrevendo frame :{}".format(t.id))
                     frame_write = cv2.resize(t.frame,(1280,720))
+                    t.frame = None
                     todas_as_frames.append(t)
                     output_movie.write(frame_write)
 
@@ -201,9 +202,11 @@ if __name__ == '__main__':
     vetor_reconhecidos = []
 
     elapsed_time = time.time() - start_time
-    print("[INFO]Tempo total: {}".format(elapsed_time))
+    print("[INFO] Tempo total: {}".format(elapsed_time))
     for t in todas_as_frames:
+        #print("Verificando frame {}".format(t.id))
         for n in t.names:
+            #print("Verificando nome {}".format(n))
             achou_nome = False
             for v in vetor_reconhecidos:
                 if n in v.names:
@@ -213,7 +216,7 @@ if __name__ == '__main__':
                 vetor_reconhecidos.append(reconhecidos(n))
 
     for v in vetor_reconhecidos:
-        print("{} apareceu em {} frames".format(v.names, v.vezes))
+        print("[INFO] {} apareceu em {} frames processadas".format(v.names, v.vezes))
 
     input_movie.release()
     cv2.destroyAllWindows()
