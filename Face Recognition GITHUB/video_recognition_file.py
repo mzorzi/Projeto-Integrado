@@ -4,6 +4,13 @@ import os
 import time
 import multiprocessing
 
+num_processadores = 4
+
+class image_queue:
+        def __init__(self, frame, id):
+            self.frame = frame
+            self.id = id
+
 
 def func(frame_recived, known_face_encodings_recived, frame_number_recived, output_movie_recived, queue_recived, queue_images_recived):
     face_locations = []
@@ -59,7 +66,8 @@ def func(frame_recived, known_face_encodings_recived, frame_number_recived, outp
             queue_recived.put(rec)
 
         if frame_number_recived == rec:
-            queue_images_recived.put(frame_recived)
+            to_put = image_queue(frame_recived, frame_number_recived)
+            queue_images_recived.put(to_put)
             #output_movie_recived.write(frame_recived)   
             queue_recived.put(rec+2)
             #if (frame_number_recived % 100) == 0:
@@ -81,8 +89,10 @@ if __name__ == '__main__':
     # OpenCV is *not* required to use the face_recognition library. It's only required if you want to run this
     # specific demo. If you have trouble installing it, try any of the other demos that don't require it instead.
 
+    start_time = time.time()
+
     # Open the input movie file
-    input_movie = cv2.VideoCapture("/home/victor/Downloads/praca4k20sec.mp4")
+    input_movie = cv2.VideoCapture("/home/murilo/Github/Dataset P.I/praca4k20sec.mp4")
     length = int(input_movie.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # Create an output movie file (make sure resolution/frame rate matches input video!)
@@ -120,10 +130,12 @@ if __name__ == '__main__':
     queue = multiprocessing.Queue()
     queue_images = multiprocessing.Queue()
     queue.put(1)
+    
+
     while process_this_frame:
         jobs = []
-        counter = 0
-        for i in range(0, 16):
+        counter = 1
+        for i in range(0, num_processadores * 2):
         # Grab a single frame of video
             ret, frame = input_movie.read()
             frame_number += 1
@@ -140,14 +152,23 @@ if __name__ == '__main__':
                 process.start()
                 print("Processo da frame {} iniciado".format(frame_number))
             else:
-                queue_images.put(frame)
+                to_put = image_queue(frame, frame_number)
+                queue_images.put(to_put)
                 print("Nao Processando a frame {}".format(frame_number))
             counter += 1
-                
-        for i in range(0,counter):
-            frame_write = queue_images.get()
-            frame_write = cv2.resize(frame_write,(1080,720))
-            output_movie.write(frame_write) 
+
+        to_write = []
+
+        for i in range(1,counter):
+            to_write.append(queue_images.get())
+            
+        for i in range(1, counter):
+            for t in to_write:
+                if t.id == (frame_number - counter + i):
+                    print("[INFO] Escrevendo frame :{}".format(t.id))
+                    frame_write = cv2.resize(t.frame,(1080,720))
+                    output_movie.write(frame_write)
+
         
         #print("Aguardando fim dos processos")
         for j in jobs:
@@ -155,6 +176,7 @@ if __name__ == '__main__':
         #print("Processos encerrados") 
 
     # All done!
-    print("acabou")
+    elapsed_time = time.time() - start_time
+    print("[INFO]Tempo total: {}".format(elapsed_time))
     input_movie.release()
     cv2.destroyAllWindows()
