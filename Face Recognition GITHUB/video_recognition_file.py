@@ -5,7 +5,7 @@ import time
 import multiprocessing
 
 num_processadores = 4
-num_frames = 8
+num_frames = 5
 #num_frames equivale á: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
 
 
@@ -192,10 +192,28 @@ if __name__ == '__main__':
         #print("Processos encerrados") 
 
     # All done!
+
+    class reconhecidos:
+        def __init__(self, name):
+            self.names = name
+            self.vezes = 1
+            
+    vetor_reconhecidos = []
+
     elapsed_time = time.time() - start_time
     print("[INFO]Tempo total: {}".format(elapsed_time))
     for t in todas_as_frames:
         for n in t.names:
-            print("{} apareceu!".format(n))
+            achou_nome = False
+            for v in vetor_reconhecidos:
+                if n in v.names:
+                    v.vezes += 1
+                    achou_nome = True
+            if not achou_nome:
+                vetor_reconhecidos.append(reconhecidos(n))
+
+    for v in vetor_reconhecidos:
+        print("{} apareceu em {} frames".format(v.names, v.vezes))
+
     input_movie.release()
     cv2.destroyAllWindows()
