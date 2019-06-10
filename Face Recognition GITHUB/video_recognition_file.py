@@ -41,8 +41,6 @@ def func(frames_to_process_recived, known_face_encodings_recived, queue_recived,
     start_time = time.time()
     for face_encoding in face_encodings:
         # See if the face is a match for the known face(s)
-        matches = face_recognition.compare_faces(
-            known_face_encodings_recived, face_encoding)
         name = unknown_face
 
         face_distances = face_recognition.face_distance(known_face_encodings_recived, face_encoding)
@@ -59,7 +57,7 @@ def func(frames_to_process_recived, known_face_encodings_recived, queue_recived,
 
             # If a match was found in known_face_encodings, just use the first one.
         if name_index != -1:
-            name = '{} {:.2f}'.format(known_face_names[name_index], ((1-menor_dist)*100))
+            name = '{} | {:.2f}'.format(known_face_names[name_index], ((1-menor_dist)*100))
 
         face_names.append(name)
 
@@ -152,7 +150,7 @@ if __name__ == '__main__':
     print("[INFO] Frames encontradas: {}".format(length))
     print("[INFO] Processadores: {}".format(num_processadores))
     print("[INFO] Pegar 1 a cada {} frames".format(num_frames))
-    unknown_face = "Unknown"
+    unknown_face = "Desconhecido"
     # Initialize some variables
     face_locations = []
     face_encodings = []
