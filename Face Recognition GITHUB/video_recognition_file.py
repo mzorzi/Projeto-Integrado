@@ -4,10 +4,12 @@ import os
 import time
 import multiprocessing
 
-num_processadores = 4
+num_processadores = 8
 num_frames = 5
-path_video = "/home/murilo/Github/Dataset P.I/praca4k5min.mp4"
-
+path_video = "/home/victor/Downloads/praca1min10sec.mp4"
+output_name = "output2.avi"
+acuracia_minima = 0.5
+#acuracia_minima de 0.6 eh no minimo 40% de ctz
 #num_frames equivale á: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
 
 
@@ -43,10 +45,21 @@ def func(frames_to_process_recived, known_face_encodings_recived, queue_recived,
             known_face_encodings_recived, face_encoding)
         name = unknown_face
 
+        face_distances = face_recognition.face_distance(known_face_encodings_recived, face_encoding)
+
+        menor_dist = 1
+        name_index = -1
+        for i, face_distance in enumerate(face_distances):
+            if face_distance < menor_dist:
+                if face_distance < acuracia_minima:
+                    menor_dist = face_distance
+                    name_index = i
+            
+
+
             # If a match was found in known_face_encodings, just use the first one.
-        if True in matches:
-            first_match_index = matches.index(True)
-            name = known_face_names[first_match_index]
+        if name_index != -1:
+            name = '{} {:.2f}'.format(known_face_names[name_index], ((1-menor_dist)*100))
 
         face_names.append(name)
 
@@ -117,7 +130,7 @@ if __name__ == '__main__':
 
     # Create an output movie file (make sure resolution/frame rate matches input video!)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    output_movie = cv2.VideoWriter('output.avi', fourcc, 30, (1280, 720))
+    output_movie = cv2.VideoWriter(output_name, fourcc, 30, (1280, 720))
 
     path = "imagens/"
 
@@ -163,8 +176,10 @@ if __name__ == '__main__':
                 if not ret:
                     process_this_frame = False
                     break
+
                 frame_number += 1
                 counter += 1
+                #frame = cv2.flip( frame, 0 ) #uncomment this if your video is upside down
                 frames_to_process.append(image_queue(frame, frame_number))
 
             if frames_to_process:
