@@ -5,12 +5,12 @@ import time
 import multiprocessing
 
 num_processadores = 8
-num_frames = 5
-path_video = "/home/victor/Downloads/praca1min10sec.mp4"
+num_frames = 1
+path_video = "/home/victor/Downloads/short_hamilton_clip.mp4"
 output_name = "output2.avi"
 acuracia_minima = 0.5
-#acuracia_minima de 0.6 eh no minimo 40% de ctz
-#num_frames equivale á: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
+#acuracia_minima de 0.5 eh no minimo 50% de ctz
+#num_frames equivale a: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
 
 
 class image_queue:
