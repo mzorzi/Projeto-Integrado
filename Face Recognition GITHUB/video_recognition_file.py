@@ -5,12 +5,12 @@ import time
 import multiprocessing
 
 num_processadores = 8
-num_frames = 1
-path_video = "/home/victor/Downloads/short_hamilton_clip.mp4"
-output_name = "output2.avi"
+num_frames = 2
+path_video = "/home/victor/Downloads/videos/praca1min10sec.mp4"
+output_name = "videosFaces/praca1min10sec_2frames.avi"
 acuracia_minima = 0.5
-#acuracia_minima de 0.5 eh no minimo 50% de ctz
-#num_frames equivale a: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
+#acuracia_minima de 0.6 eh no minimo 40% de ctz
+#num_frames equivale á: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
 
 
 class image_queue:
@@ -177,7 +177,8 @@ if __name__ == '__main__':
 
                 frame_number += 1
                 counter += 1
-                #frame = cv2.flip( frame, 0 ) #uncomment this if your video is upside down
+                #frame = cv2.flip( frame, 0 ) #uncomment this line if your video is upside down
+                #frame = cv2.resize(frame,(1280,720)) #uncomment this line if you want to change the input resolution. 1280x720 = Full HD
                 frames_to_process.append(image_queue(frame, frame_number))
 
             if frames_to_process:
