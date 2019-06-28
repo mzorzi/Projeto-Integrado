@@ -4,10 +4,10 @@ import os
 import time
 import multiprocessing
 
-num_processadores = 8
+num_processadores = 4
 num_frames = 2
-path_video = "/home/victor/Downloads/videos/praca1min10sec.mp4"
-output_name = "videosFaces/praca1min10sec_2frames.avi"
+path_video = "/home/murilo/Github/Dataset PI/praca4k3sec.mp4"
+output_name = "praca4k3sec.avi"
 acuracia_minima = 0.5
 #acuracia_minima de 0.6 eh no minimo 40% de ctz
 #num_frames equivale á: quero pegar 1 frame a cada 3, logo, o valor de num_frames = 3
@@ -42,7 +42,8 @@ def func(frames_to_process_recived, known_face_encodings_recived, queue_recived,
     for face_encoding in face_encodings:
         # See if the face is a match for the known face(s)
         name = unknown_face
-
+        print("face encoding:")
+        print(face_encoding)
         face_distances = face_recognition.face_distance(known_face_encodings_recived, face_encoding)
 
         menor_dist = 1
