@@ -18,7 +18,7 @@ import os
 # Open video file
 start_total_time = time.time()
 
-video_capture = cv2.VideoCapture("/home/murilo/Github/Dataset P.I/praca4k20sec.mp4")
+video_capture = cv2.VideoCapture("/home/murilo/Github/Dataset PI/praca4k5min.mp4")
 length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
 batch_size = 2
