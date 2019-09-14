@@ -1,6 +1,7 @@
 # PyQt5 Video player
 #!/usr/bin/env python
 
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QDir, Qt, QUrl
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
@@ -9,9 +10,12 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLabel,
 from PyQt5.QtWidgets import QMainWindow,QWidget, QPushButton, QAction
 from PyQt5.QtGui import QIcon
 import sys
+import time
+
+
 
 class VideoWindow(QMainWindow):
-
+    start_time = 0.0
     def __init__(self, parent=None):
         super(VideoWindow, self).__init__(parent)
         self.setWindowTitle("Video") 
@@ -56,6 +60,27 @@ class VideoWindow(QMainWindow):
         wid = QWidget(self)
         self.setCentralWidget(wid)
 
+        start_time = time.time()
+
+        # Create side layout
+        mainLayout = QHBoxLayout()
+
+        self.label = QtWidgets.QLabel("Faces: ")
+        self.label.setObjectName("label")
+        self.label_2 = QtWidgets.QLabel("Total: ")
+        self.label_2.setObjectName("label_2")
+        self.label_3 = QtWidgets.QLabel("Tempo: %.2f" % (time.time() - start_time))
+        self.label_3.setObjectName("label_3")
+        self.label_4 = QtWidgets.QLabel("")
+        self.label_4.setObjectName("Duração: ")
+
+        sideLayout = QVBoxLayout()
+        sideLayout.setContentsMargins(0, 50, 0, 130)
+        sideLayout.addWidget(self.label)
+        sideLayout.addWidget(self.label_2)
+        sideLayout.addWidget(self.label_3)
+        sideLayout.addWidget(self.label_4)
+
         # Create layouts to place inside widget
         controlLayout = QHBoxLayout()
         controlLayout.setContentsMargins(0, 0, 0, 0)
@@ -63,14 +88,17 @@ class VideoWindow(QMainWindow):
         controlLayout.addWidget(self.positionSlider)
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(150, 20, 20, 50)
         layout.addWidget(videoWidget)
         layout.addLayout(controlLayout)
         layout.addWidget(self.errorLabel)
 
+        mainLayout.addLayout(sideLayout)
+        mainLayout.addLayout(layout)
         # Set widget to contain window contents
-        wid.setLayout(layout)
+        wid.setLayout(mainLayout)
+        #wid.setLayout(sideLayout)
 
-        self.mediaPlayer.setGeometry(QtCore.QRect(130, 110, 641, 371))
         self.mediaPlayer.setVideoOutput(videoWidget)
         self.mediaPlayer.stateChanged.connect(self.mediaStateChanged)
         self.mediaPlayer.positionChanged.connect(self.positionChanged)
@@ -102,6 +130,7 @@ class VideoWindow(QMainWindow):
         else:
             self.playButton.setIcon(
                     self.style().standardIcon(QStyle.SP_MediaPlay))
+                    
 
     def positionChanged(self, position):
         self.positionSlider.setValue(position)
@@ -119,6 +148,6 @@ class VideoWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     player = VideoWindow()
-    player.resize(640, 480)
+    player.resize(1024, 600)
     player.show()
     sys.exit(app.exec_())
